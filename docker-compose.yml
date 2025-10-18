@@ -39,6 +39,7 @@ services:
       - ./docker/mysql/sube.sql:/docker-entrypoint-initdb.d/sube.sql
     networks:
       - appnetwork
+    command: --default-authentication-plugin=mysql_native_password
     healthcheck:
       # test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p1234"]
@@ -99,6 +100,15 @@ services:
       redis:
         condition: service_healthy
   
+  postfix-sube:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: postfix-container-sube
+    restart: always
+    ports:
+      - "25:25"
+
 volumes:
   mysql_data:
   redis_data:

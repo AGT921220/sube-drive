@@ -26,18 +26,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        app()->singleton('currentModule', function () {
-            return Cache::remember('current_module_default', 6000, function () {
-                return Module::where('default_module', '1')->first();
+        try {
+            app()->singleton('currentModule', function () {
+                return Cache::remember('current_module_default', 6000, function () {
+                    return Module::where('default_module', '1')->first();
+                });
             });
-        });
 
-        $settings = Cache::rememberForever('general_settings', function () {
-            return GeneralSetting::pluck('meta_value', 'meta_key')->toArray();
-        });
+            $settings = Cache::rememberForever('general_settings', function () {
+                return GeneralSetting::pluck('meta_value', 'meta_key')->toArray();
+            });
 
-        foreach ($settings as $key => $value) {
-            Config::set("general.$key", $value);
+            foreach ($settings as $key => $value) {
+                Config::set("general.$key", $value);
+            }
+        } catch (\Throwable $e) {
+            // Las tablas aún no existen, esto es normal durante la instalación/migración
+            \Log::info('Database tables not ready yet: '.$e->getMessage());
         }
 
         try {

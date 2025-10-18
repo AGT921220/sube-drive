@@ -1,6 +1,6 @@
 FROM php:8.2-fpm
 
-# Instalar dependencias necesarias
+# Instalar dependencias necesarias incluyendo librerías para GRPC y Sodium
 RUN apt-get update && apt-get install -y \
     default-mysql-client \
     supervisor \
@@ -12,14 +12,18 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libpq-dev \
-    libssl-dev \
+    zlib1g-dev \
     libsodium-dev \
     && docker-php-ext-install -j$(nproc) iconv mysqli pdo pdo_mysql zip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd \
-    && docker-php-ext-install mbstring exif pcntl bcmath soap \
-    && docker-php-ext-install ctype json openssl tokenizer xml fileinfo sodium \
-    && pecl install redis grpc && docker-php-ext-enable redis grpc
+    && docker-php-ext-install mbstring exif pcntl bcmath soap sodium \
+    && docker-php-ext-install fileinfo \
+    && pecl install redis && docker-php-ext-enable redis
+
+# Instalar GRPC extension (comentado temporalmente por tiempo de compilación)
+# Descomentar si necesitas usar Firebase/Firestore
+# RUN pecl install grpc && docker-php-ext-enable grpc
 
 # Instalar Xdebug
 RUN pecl install xdebug \
@@ -34,11 +38,11 @@ RUN mkdir -p /var/www/html/bootstrap/cache && \
     chmod -R 775 /var/www/html/bootstrap/cache
 
 # Copiar archivos de configuración de Supervisor
-# COPY horizon.conf /etc/supervisor/conf.d/horizon.conf
+COPY horizon.conf /etc/supervisor/conf.d/horizon.conf
 
-# # Copiar el script de entrada y otros archivos de configuración necesarios
-# COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-# COPY ./docker/php/php.ini /usr/local/etc/php/
+# Copiar el script de entrada y otros archivos de configuración necesarios
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ./docker/php/php.ini /usr/local/etc/php/
 
 # Hacer ejecutable el script de entrada
 #RUN chmod +x /usr/local/bin/entrypoint.sh
@@ -47,7 +51,7 @@ RUN mkdir -p /var/www/html/bootstrap/cache && \
 #ENTRYPOINT ["entrypoint.sh"]
 
 
-# RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# # Definir el comando para ejecutar el script de entrada
-# ENTRYPOINT ["sh", "/usr/local/bin/entrypoint.sh"]
+# Definir el comando para ejecutar el script de entrada
+ENTRYPOINT ["sh", "/usr/local/bin/entrypoint.sh"]

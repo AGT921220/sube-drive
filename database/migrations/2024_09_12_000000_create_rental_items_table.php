@@ -51,12 +51,12 @@ class CreateRentalItemsTable extends Migration
             $table->softDeletes();
             $table->timestamps();
 
-            // Foreign Key Constraints
-            $table->foreign('userid_id')->references('id')->on('app_users')->onDelete('cascade');
-            $table->foreign('item_type_id')->references('id')->on('item_types')->onDelete('cascade');
-            $table->foreign('place_id')->references('id')->on('cities')->onDelete('cascade');
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->foreign('subcategory_id')->references('id')->on('subcategories')->onDelete('cascade');
+            // Foreign Key Constraints - Comentadas porque se agregan en migraciones posteriores
+            // $table->foreign('userid_id')->references('id')->on('app_users')->onDelete('cascade');
+            // $table->foreign('item_type_id')->references('id')->on('item_types')->onDelete('cascade');
+            // $table->foreign('place_id')->references('id')->on('cities')->onDelete('cascade');
+            // $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+            // $table->foreign('subcategory_id')->references('id')->on('subcategories')->onDelete('cascade');
         });
     }
 
