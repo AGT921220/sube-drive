@@ -50,7 +50,7 @@ create-testing-db:
 # 	fi
 # 	@docker exec -i mysql-sube mysqldump -u user -ppassword db > testing_db.sql
 db-export:
-	@docker exec -i mysql-sube mysqldump -u user -ppassword db > storage/app/sube.sql
+	@docker exec -i mysql-sube mysqldump -u ${MYSQL_USER} -ppassword db > storage/app/sube.sql
 
 restart-testing-db:
 	@docker exec -i mysql-sube mysql -u user -ppassword -e "CREATE DATABASE testing;"
@@ -120,8 +120,8 @@ create-valid-path:
 	mkdir -p storage/framework/views
 
 import-db:
-	@docker exec -i ${DB_HOST} mysql -u user -ppassword -e "DROP DATABASE IF EXISTS ${DB_DATABASE}; CREATE DATABASE ${DB_DATABASE};"
-	@docker exec -i ${DB_HOST} mysql -u user -ppassword ${DB_DATABASE} < storage/app/sube.sql
+	@docker exec -i ${DB_HOST} mysql -u ${MYSQL_USER} -ppassword -e "DROP DATABASE IF EXISTS ${DB_DATABASE}; CREATE DATABASE ${DB_DATABASE};"
+	@docker exec -i ${DB_HOST} mysql -u ${MYSQL_USER} -ppassword ${DB_DATABASE} < storage/app/sube.sql
 
 testing/import-db:
 	@docker exec -i ${DB_HOST} mysql -u user -ppassword -e "DROP DATABASE IF EXISTS testing; CREATE DATABASE testing;"
