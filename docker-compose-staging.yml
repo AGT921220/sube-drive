@@ -23,7 +23,7 @@ services:
     container_name: redis-sube
     restart: always
     ports:
-      - "{PORT_REDIS:-6379}:6379"
+      - "${PORT_REDIS:-6379}:6379"
     volumes:
       - redis_data:/data
     networks:
