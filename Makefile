@@ -173,5 +173,5 @@ push-signs-images-server:
 	@scp -r public/images/usuarios/firma_digital/ root@$(SERVER_IP):/home/sube-drive/public/images/usuarios/
 	
 staging/import-db:
-	@docker exec -i mysql-staging mysql -u user -p${DB_PASSWORD} -e "DROP DATABASE IF EXISTS sube; CREATE DATABASE sube;"
-	@docker exec -i mysql-staging mysql -u user -p${DB_PASSWORD} sube < storage/app/sube.sql
+	@docker exec -i mysql-staging mysql -u ${MYSQL_USER} -p${DB_PASSWORD} -e "DROP DATABASE IF EXISTS sube; CREATE DATABASE sube;"
+	@docker exec -i mysql-staging mysql -u ${MYSQL_USER} -p${DB_PASSWORD} sube < storage/app/sube.sql
