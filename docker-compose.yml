@@ -100,14 +100,14 @@ services:
       redis:
         condition: service_healthy
   
-  postfix-sube:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: postfix-container-sube
-    restart: always
-    ports:
-      - "25:25"
+  # postfix-sube:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: postfix-container-sube
+  #   restart: always
+  #   ports:
+  #     - "25:25"
 
 volumes:
   mysql_data:
