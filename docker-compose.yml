@@ -23,7 +23,7 @@ services:
       - appnetwork
 
   mysql:
-    image: mysql:5.7.32
+    image: mysql:8.2
     container_name: mysql-sube
     restart: always
     tty: true
@@ -99,15 +99,6 @@ services:
       redis:
         condition: service_healthy
   
-  postfix-sube:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: postfix-container-sube
-    restart: always
-    ports:
-      - "25:25"
-
 volumes:
   mysql_data:
   redis_data:
