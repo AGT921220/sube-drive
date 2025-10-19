@@ -7,6 +7,7 @@ use App\Models\Module;
 use App\Services\FirestoreService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         try {
+            if (app()->environment('production')) {
+                URL::forceScheme('https');
+            }
             app()->singleton('currentModule', function () {
                 return Cache::remember('current_module_default', 6000, function () {
                     return Module::where('default_module', '1')->first();
@@ -42,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
             }
         } catch (\Throwable $e) {
             // Las tablas aún no existen, esto es normal durante la instalación/migración
-            \Log::info('Database tables not ready yet: '.$e->getMessage());
+            \Log::info('Database tables not ready yet: ' . $e->getMessage());
         }
 
         try {
@@ -52,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
             // Trigger a harmless read to force credentials init
             $firestore->getCollection('drivers');
         } catch (\Throwable $e) {
-            \Log::warning('Firestore warmup failed: '.$e->getMessage());
+            \Log::warning('Firestore warmup failed: ' . $e->getMessage());
         }
     }
 }
