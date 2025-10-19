@@ -31,3 +31,5 @@ Homestead.json
 auth.json
 /storage
 storage
+docker/nginx/logs
+docker/mysqltest
