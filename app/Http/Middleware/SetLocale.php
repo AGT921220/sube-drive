@@ -9,6 +9,9 @@ class SetLocale
     public function handle($request, Closure $next)
     {
         if (request('change_language')) {
+            dump(request('change_language'));
+            dd('llegue');
+            
             session()->put('language', request('change_language'));
             $language = request('change_language');
         } elseif (session('language')) {

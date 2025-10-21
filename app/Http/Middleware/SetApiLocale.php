@@ -16,7 +16,7 @@ class SetApiLocale
     public function handle(Request $request, Closure $next): Response
     {
         $locale = $request->input('lang'); // get lang from JSON body
-
+        dd($locale);
         if ($locale && in_array($locale, ['en', 'fr', 'es', 'de', 'it', 'ar'])) {
 
             app()->setLocale($locale);

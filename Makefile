@@ -113,7 +113,7 @@ install-xdebug:
 phpunit-config:
 	@alias phpunit='./vendor/bin/phpunit';
 ngrok:
-	@ngrok http --host-header=rewrite http://localhost:8088;
+	@ngrok http --host-header=rewrite http://localhost:${PORT_NGINX};
 
 create-valid-path:
 	@mkdir -p storage/framework/cache \
