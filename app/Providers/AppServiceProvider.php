@@ -49,14 +49,13 @@ class AppServiceProvider extends ServiceProvider
             \Log::info('Database tables not ready yet: ' . $e->getMessage());
         }
 
-        try {
-            /** @var \App\Services\FirestoreService $firestore */
-            $firestore = app(FirestoreService::class);
-
-            // Trigger a harmless read to force credentials init
-            $firestore->getCollection('drivers');
-        } catch (\Throwable $e) {
-            \Log::warning('Firestore warmup failed: ' . $e->getMessage());
-        }
+        // Firestore warmup desactivado - se inicializa cuando se necesita
+        // try {
+        //     /** @var \App\Services\FirestoreService $firestore */
+        //     $firestore = app(FirestoreService::class);
+        //     $firestore->getCollection('drivers');
+        // } catch (\Throwable $e) {
+        //     \Log::warning('Firestore warmup failed: ' . $e->getMessage());
+        // }
     }
 }

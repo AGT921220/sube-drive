@@ -30,6 +30,7 @@ use Gate;
 use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
@@ -225,53 +226,58 @@ class AppUsersApiController extends Controller
 
     public function otpVerification(Request $request)
     {
-        // try {
-        $validator = Validator::make($request->all(), [
-            'phone' => ['required', 'numeric', 'min:9'],
-            'otp_value' => ['required'],
-            'phone_country' => ['required'],
-        ]);
-
-        if ($validator->fails()) {
-            return $this->errorComputing($validator);
-        }
-
-        if (AppUser::where('phone', $request->phone)->where('phone_country', $request->phone_country)->exists()) {
-            $resultOtp = $this->validateOtpFromDB($request->phone, $request->phone_country, $request->otp_value);
-            if ($resultOtp['status'] === 'success') {
-
-                $token = Str::random(120);
-                $customer = AppUser::where('phone', $request->phone)->where('phone_country', $request->phone_country)->first();
-                $customer->update(['otp_value' => '0', 'email_verify' => '1', 'phone_verify' => '1', 'status' => '1', 'verified' => '1']);
-                $module = $this->getModuleIdOrDefault($request);
-                $item = Item::where('userid_id', $customer->id)->first();
-
-                if (! $item) {
-
-                    $item = Item::create([
-                        'userid_id' => $customer->id,
-                    ]);
-                }
-
-                $customer['item_id'] = $item->id;
-
-                $remainingItems = $this->checkRemainingItems($customer->id, $module);
-
-                if ($remainingItems) {
-                    $customer['remaining_items'] = $remainingItems;
-                } else {
-                    $customer['remaining_items'] = 0;
-                }
-
-                return $this->successResponse(200, trans('global.Login_Sucessfully'), $customer);
-            } else {
-                return $this->errorResponse(401, trans('global.Wrong_OTP'));
-            }
-        } else {
-            return $this->errorResponse(404, trans('global.User_not_register'));
-        }
         try {
+            $validator = Validator::make($request->all(), [
+                'phone' => ['required', 'numeric', 'min:9'],
+                'otp_value' => ['required'],
+                'phone_country' => ['required'],
+            ]);
+
+            if ($validator->fails()) {
+                return $this->errorComputing($validator);
+            }
+
+            if (AppUser::where('phone', $request->phone)->where('phone_country', $request->phone_country)->exists()) {
+                $resultOtp = $this->validateOtpFromDB($request->phone, $request->phone_country, $request->otp_value);
+                if ($resultOtp['status'] === 'success') {
+
+                    $token = Str::random(120);
+                    $customer = AppUser::where('phone', $request->phone)->where('phone_country', $request->phone_country)->first();
+                    $customer->update(['otp_value' => '0', 'email_verify' => '1', 'phone_verify' => '1', 'status' => '1', 'verified' => '1']);
+                    $module = $this->getModuleIdOrDefault($request);
+                    $item = Item::where('userid_id', $customer->id)->first();
+
+                    if (! $item) {
+
+                        $item = Item::create([
+                            'userid_id' => $customer->id,
+                        ]);
+                    }
+
+                    $customer['item_id'] = $item->id;
+
+                    $remainingItems = $this->checkRemainingItems($customer->id, $module);
+
+                    if ($remainingItems) {
+                        $customer['remaining_items'] = $remainingItems;
+                    } else {
+                        $customer['remaining_items'] = 0;
+                    }
+
+                    return $this->successResponse(200, trans('global.Login_Sucessfully'), $customer);
+                } else {
+                    return $this->errorResponse(401, trans('global.Wrong_OTP'));
+                }
+            } else {
+                return $this->errorResponse(404, trans('global.User_not_register'));
+            }
         } catch (\Exception $e) {
+            Log::error('Error en otpVerification: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all(),
+            ]);
             return $this->errorResponse(401, trans('global.something_wrong'));
         }
     }
@@ -328,6 +334,12 @@ class AppUsersApiController extends Controller
                 return $this->errorResponse(401, trans('global.something_wrong'));
             }
         } catch (\Exception $e) {
+            \Log::error('Error en userLogin: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->except(['password']),
+            ]);
             return $this->errorResponse(401, trans('global.something_wrong'));
         }
     }
@@ -430,6 +442,12 @@ class AppUsersApiController extends Controller
             }
             // try {
         } catch (\Exception $e) {
+            Log::error('Error en userEmailLogin: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->except(['password']),
+            ]);
             return $this->errorResponse(401, trans('global.something_wrong'));
         }
     }

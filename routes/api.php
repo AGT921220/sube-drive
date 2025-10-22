@@ -13,6 +13,30 @@ Route::post('/paypal/webhook', [PaypalStrategy::class, 'handleWebhook'])
 
 Route::post('/generateToken', [TokenController::class, 'issueSanctumToken'])
     ->name('token.generate');
+
+// Ruta de prueba para verificar logging
+Route::get('/test-logging', function () {
+    \Log::info('Test de logging - INFO level');
+    \Log::error('Test de logging - ERROR level', [
+        'test_data' => 'datos de prueba',
+        'timestamp' => now(),
+    ]);
+    
+    try {
+        throw new \Exception('Excepción de prueba para verificar logging');
+    } catch (\Exception $e) {
+        \Log::error('Excepción capturada en test: ' . $e->getMessage(), [
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+    }
+    
+    return response()->json([
+        'message' => 'Test de logging completado. Revisa storage/logs/laravel.log',
+        'log_path' => storage_path('logs/laravel.log'),
+    ]);
+});
+
 // 'auth:sanctum'
 
 Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', 'middleware' => ['auth:sanctum']], function () {

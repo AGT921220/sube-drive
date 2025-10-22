@@ -14,6 +14,7 @@ class TokenController extends Controller
 
     public function issueSanctumToken(Request $request)
     {
+        info($request->all());
         $sanctumSecret = '49382716504938271650493827165049';
 
         $validator = Validator::make($request->all(), [
